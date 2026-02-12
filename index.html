@@ -90,6 +90,19 @@
       margin: 0;
       font-weight: bold;
     }
+
+    /* Sparkle animation */
+    @keyframes sparkle {
+    0% { box-shadow: 0 0 5px #fff; }
+    50% { box-shadow: 0 0 20px #ff4d6d, 0 0 30px #ff99aa; }
+    100% { box-shadow: 0 0 5px #fff; }
+    }
+    
+    .sparkle {
+    animation: sparkle 1s infinite;
+    transform: scale(1.5);
+    font-size: 26px;
+    }
   </style>
 </head>
 <body>
@@ -119,7 +132,7 @@
   });
 
   function moveNoButtonSafely() {
-    const margin = 20; // keeps it away from edges
+    const margin = 20;
 
     const btnW = noBtn.offsetWidth;
     const btnH = noBtn.offsetHeight;
@@ -130,33 +143,37 @@
     const x = Math.floor(margin + Math.random() * (maxX - margin));
     const y = Math.floor(margin + Math.random() * (maxY - margin));
 
-    noBtn.style.position = "fixed";  // fixed = always relative to viewport
+    noBtn.style.position = "fixed";
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
   }
 
-  // Count "attempts" when they try to get near it
-  noBtn.addEventListener("mouseenter", () => {
+  function triggerValentineMode() {
+    // Show popup
+    noPopup.style.display = "block";
+
+    // Remove the No button
+    noBtn.style.display = "none";
+
+    // Enlarge and sparkle the Yes button
+    yesBtn.classList.add("sparkle");
+  }
+
+  function handleNoAttempt(e) {
+    if (e) e.preventDefault();
+
     noAttempts++;
 
-    if (noAttempts === 3) {
-      noPopup.style.display = "block";
+    if (noAttempts >= 3) {
+      triggerValentineMode();
+      return;
     }
 
     moveNoButtonSafely();
-  });
+  }
 
-  // (Optional) Also dodge if they manage to tap/click it on mobile
-  noBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    noAttempts++;
-
-    if (noAttempts === 3) {
-      noPopup.style.display = "block";
-    }
-
-    moveNoButtonSafely();
-  });
+  noBtn.addEventListener("mouseenter", handleNoAttempt);
+  noBtn.addEventListener("click", handleNoAttempt);
 </script>
 </body>
 </html>
