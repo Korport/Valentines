@@ -13,6 +13,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      overflow: hidden;
     }
 
     .container {
@@ -20,6 +21,8 @@
       padding: 40px;
       border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 2;
     }
 
     h1 {
@@ -59,6 +62,34 @@
       color: #ff4d6d;
       display: none;
     }
+
+    /* Popup image/message */
+    #noPopup {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      display: none;
+      z-index: 3;
+    }
+
+    #noPopup img {
+      width: 200px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    #noPopup p {
+      font-size: 20px;
+      color: #ff4d6d;
+      margin: 0;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -69,24 +100,63 @@
     <div id="message">Yay!! I knew you'd say yes! 💖</div>
   </div>
 
+  <!-- Hidden popup -->
+  <div id="noPopup">
+    <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Cute pleading cat">
+    <p>Just stop and be my valentine! 💘</p>
+  </div>
+
   <script>
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const message = document.getElementById("message");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const message = document.getElementById("message");
+  const noPopup = document.getElementById("noPopup");
 
-    yesBtn.addEventListener("click", () => {
-      message.style.display = "block";
-    });
+  let noAttempts = 0;
 
-    // Make the "No" button run away
-    noBtn.addEventListener("mouseover", () => {
-      const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-      const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+  yesBtn.addEventListener("click", () => {
+    message.style.display = "block";
+  });
 
-      noBtn.style.position = "absolute";
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-    });
-  </script>
+  function moveNoButtonSafely() {
+    const margin = 20; // keeps it away from edges
+
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
+
+    const maxX = Math.max(margin, window.innerWidth - btnW - margin);
+    const maxY = Math.max(margin, window.innerHeight - btnH - margin);
+
+    const x = Math.floor(margin + Math.random() * (maxX - margin));
+    const y = Math.floor(margin + Math.random() * (maxY - margin));
+
+    noBtn.style.position = "fixed";  // fixed = always relative to viewport
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+  }
+
+  // Count "attempts" when they try to get near it
+  noBtn.addEventListener("mouseenter", () => {
+    noAttempts++;
+
+    if (noAttempts === 3) {
+      noPopup.style.display = "block";
+    }
+
+    moveNoButtonSafely();
+  });
+
+  // (Optional) Also dodge if they manage to tap/click it on mobile
+  noBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    noAttempts++;
+
+    if (noAttempts === 3) {
+      noPopup.style.display = "block";
+    }
+
+    moveNoButtonSafely();
+  });
+</script>
 </body>
 </html>
